@@ -788,6 +788,31 @@ header.top,header.top::before{background:#FFFFFF!important}
 .qerow .btn{flex:none}
 .fpstatic>b{display:block;margin-bottom:6px!important}.fpstatic .fpbody{margin-top:0}
 .schedsheet .sheet-head .btn,.schedsheet .donebtn,.schedsheet .wnav{display:none!important}
+
+.lgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.ltile{background:var(--card);border-radius:14px;box-shadow:var(--shadow);min-height:118px;display:flex}
+.lslot.multi{display:grid;gap:6px}.lslot.multi .ltile{min-height:0}
+.lt-b{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;gap:3px;width:100%;padding:8px 8px 8px;min-width:0}
+.lt-top{display:flex;align-items:baseline;gap:5px;color:var(--ink)}
+.lt-top b{font-family:var(--display);font-size:17px;color:var(--accent);line-height:1}
+.lt-top span{font-size:11px;opacity:.7;font-variant-numeric:tabular-nums}
+.lt-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);margin-left:auto;align-self:center}
+.lt-cls{font-family:var(--display);font-size:20px;line-height:1.05;letter-spacing:-.02em;margin-top:2px}
+.lt-sub{font-size:11.5px;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lt-tags{display:flex;flex-wrap:wrap;gap:3px}
+.lt-tags>span{font-size:10.5px;padding:1px 6px;border-radius:999px;background:var(--chip);font-weight:600}
+.lt-tags .lt-room{background:var(--away);color:#fff}
+.lt-tags .lt-x{background:#F3D9C4}
+.lt-j{margin-top:auto;display:block;text-align:center;font-size:11.5px;font-weight:700;color:#fff;background:#E5322D;border-radius:8px;padding:5px 2px;white-space:nowrap}
+.lt-j.ok{background:#159A57}
+.ltile.empty{background:transparent;box-shadow:inset 0 0 0 1.5px var(--chip);padding:8px;opacity:.55}
+.ltile.empty .lt-top b{color:var(--ink)}
+.ltile.muted{opacity:.7}
+.ltile.cancelled .lt-cls,.ltile.cancelled .lt-sub{text-decoration:line-through;opacity:.55}
+.ltile.is-now{background:#E2F5EA;box-shadow:inset 0 0 0 2px var(--ok),var(--shadow)}
+.ltile.is-now .lt-top b{color:var(--ok)}
+@media (min-width:700px){.lgrid{gap:10px}.ltile{min-height:132px}.lt-b{padding:12px}.lt-cls{font-size:24px}.lt-sub{font-size:13px}.lt-top b{font-size:19px}.lt-top span{font-size:12.5px}.lt-j{font-size:13px;padding:7px 4px}}
+.lj-l{display:none}@media (min-width:700px){.lj-s{display:none}.lj-l{display:inline}}
 </style>
 
 <div class="app">
@@ -997,6 +1022,18 @@ function accRow(x){const open=false;
       ${dots(x.id)}<span class="go accgo" aria-hidden="true">›</span></button>
     ${open?`<div class="accpanel">${lessonFields(x.id)}<div class="accfoot"><button class="linkbtn" data-open="${x.id}">Открыть во весь экран</button><button class="btn" data-acc="${x.id}">Свернуть</button></div></div>`:''}</div>`;
 }
+const SUBT={'Математика':'Матем.','Геометрия':'Геом.','Вероятность и статистика':'ВиС','Разговоры о важном':'Разг. о важн.','Трудные вопросы математики':'Трудн. вопр.'};
+const subTile=s=>SUBT[s]||s;
+function lTile(x){const away=isAway(roomOf(x)),ju=journalUrl(x),ok=get(x.id,'hwp'),filled=get(x.id,'done').trim();
+  return `<div class="ltile ${isCancel(x)?'cancelled':''} ${x.extra?'extra':''}" data-accid="${x.id}"><button class="lt-b" data-acc="${x.id}">
+    <span class="lt-top"><b>${x.l}</b><span>${t0(x.l)}</span>${filled?'<i class="lt-dot"></i>':''}</span>
+    <b class="lt-cls">${x.cls}</b><span class="lt-sub">${subTile(x.sub)}</span>
+    <span class="lt-tags">${away?`<span class="lt-room">${roomOf(x)}</span>`:''}${x.n>1?`<span class="lt-k">${x.k+1}/${x.n}</span>`:''}${isCancel(x)?'<span class="lt-x">отменён</span>':''}${x.extra?'<span class="lt-x">замена</span>':''}</span>
+    ${ju&&!isCancel(x)?`<span class="lt-j ${ok?'ok':''}" role="link" tabindex="0" data-jurl="${ju}" data-jid="${x.id}"><span class="lj-s">${ok?'✓ Оц/дз':'Оц/дз'}</span><span class="lj-l">${ok?'✓ Оценки/дз':'Оценки/дз'}</span></span>`:''}</button></div>`}
+function eTile(e){return `<div class="ltile muted"><div class="lt-b" style="cursor:default"><span class="lt-top"><b>${e.l}</b><span>${t0(e.l)}</span></span><b class="lt-cls">${e.cls}</b><span class="lt-sub">${subTile(e.sub)}</span><span class="lt-tags">${isAway(e.r)?`<span class="lt-room">${e.r}</span>`:''}</span></div></div>`}
+function lessonGrid(lsAll,D){const by={};lsAll.forEach(x=>(by[x.l]=by[x.l]||[]).push(lTile(x)));EXTRA.filter(e=>e.wd===D.wd).forEach(e=>(by[e.l]=by[e.l]||[]).push(eTile(e)));
+  let h='';for(let n=1;n<=12;n++){h+=by[n]?(by[n].length>1?`<div class="lslot multi">${by[n].join('')}</div>`:by[n][0]):`<div class="ltile empty"><span class="lt-top"><b>${n}</b><span>${t0(n)}</span></span></div>`}
+  return `<div class="lgrid">${h}</div>`}
 function extraCard(e){return `<div class="acc muted ${isAway(e.r)?'r302':''}"><div class="acchead" style="cursor:default"><span class="num"><b>${e.l}</b><span>${t0(e.l)}</span></span>
   <span class="what"><span class="acl"><b class="cls">${e.cls}</b><span class="sub">${e.sub}</span></span><span class="meta"><span class="pill ${isAway(e.r)?'room302':''}">каб. ${e.r}</span></span></span><span></span><span></span></div></div>`}
 function weekNav(){const w=byIso[day].w;return `<div class="wnav"><button class="wbtn" data-wnav="-1" aria-label="Предыдущая неделя" ${w===0?'disabled':''}>‹</button>
@@ -1057,8 +1094,8 @@ function renderWeek(){
   const D=byIso[day]; if(isOff(day))return modeBar()+quickEntry()+picker()+offBox(D)+`<div class="wnavbot">${weekNav()}</div>`;
   const lsAll=dayLessons(day,true), ls=lsAll.filter(x=>!isCancel(x));
   const items=[...lsAll.map(x=>({l:x.l,h:accRow(x)})),...EXTRA.filter(e=>e.wd===D.wd).map(e=>({l:e.l,h:extraCard(e)}))].sort((a,b)=>a.l-b.l);
-  return modeBar()+quickEntry()+picker()+`<p class="hint">${WFULL[D.wd]}, ${D.label} · ${ls.length} ${plural(ls.length)}.</p><div class="list">${items.map(i=>i.h).join('')}</div>
-  <div class="legend"><span><i class="sw"></i>другой кабинет, не 03-03</span><span><i class="dt"></i>заполнено: прошли · подготовить · д/з</span></div>
+  return modeBar()+quickEntry()+picker()+`<p class="hint">${WFULL[D.wd]}, ${D.label} · ${ls.length} ${plural(ls.length)}.</p>${lessonGrid(lsAll,D)}
+  <div class="legend"><span><i class="sw"></i>другой кабинет, не 03-03</span><span><i class="dt"></i>есть заметка</span></div>
   ${xForm?xFormHtml(null,D):''}
   <div class="dayfoot"><button class="btn attach" data-xform="1">+ Замена или доп. урок</button><button class="btn attach" data-export>Неделя в Word</button><button class="linkbtn" data-toggle-off="${day}">Отметить день как выходной</button></div><div class="wnavbot">${weekNav()}</div>`;
 }
