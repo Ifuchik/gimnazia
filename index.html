@@ -851,6 +851,18 @@ header.top,header.top::before{background:#FFFFFF!important}
 .from-prev.fpstatic{background:#FFF7D6!important;border:1px solid #F3E3A3!important}
 
 #eyebrow{white-space:nowrap}
+
+.ph-r{display:flex;gap:8px;align-items:center}
+.schedfab.inhead{position:static!important;width:44px;height:44px;flex:0 0 auto}
+.prepsheet .lgrid{gap:6px}
+.prepsheet .ltile{min-height:0;height:78px}
+.prepsheet .lt-b{padding:6px 8px;gap:1px}
+.prepsheet .lt-cls{font-size:18px;margin-top:0}
+.prepsheet .pt-mark{margin-top:auto;font-size:10.5px;font-weight:700;color:#8A6A00}
+.prepsheet .section-title{margin:6px 0 8px}
+.prepsheet .days{margin-bottom:8px}
+.prepsheet .wnavbot{margin-top:10px}
+@media (min-width:700px){.prepsheet .ltile{height:96px}.prepsheet .lt-cls{font-size:22px}.prepsheet .pt-mark{font-size:12px}}
 </style>
 
 <div class="app">
@@ -1156,14 +1168,13 @@ function prepTile(x){const src=x.prev,t=src?(get(src.id,'done')||'').trim():'',a
   return `<div class="ltile ptile ${t?'has':''}"><button class="lt-b" data-open="${src?src.id:x.id}">
     <span class="lt-top"><b>${x.l}</b><span>${t0(x.l)}</span></span>
     <b class="lt-cls">${x.cls}</b><span class="lt-sub">${subTile(x.sub)}</span>
-    ${away?`<span class="lt-tags"><span class="lt-room">${roomOf(x)}</span></span>`:''}
-    <span class="pt-note">${t?esc(t):'нет заметок'}</span></button></div>`}
+    ${away?`<span class="lt-tags"><span class="lt-room">${roomOf(x)}</span></span>`:''}</button></div>`}
 function prepGrid(ls){const by={};ls.forEach(x=>(by[x.l]=by[x.l]||[]).push(prepTile(x)));let h='';
   for(let n=1;n<=12;n++)h+=by[n]?(by[n].length>1?`<div class="lslot multi">${by[n].join('')}</div>`:by[n][0]):`<div class="ltile empty"><span class="lt-top"><b>${n}</b><span>${t0(n)}</span></span></div>`;
   return `<div class="lgrid">${h}</div>`}
 function renderPrep(){
   const D=byIso[day];
-  let h=picker()+`<p class="hint">Здесь собраны заметки с предыдущего урока каждого класса, в том числе с прошлой недели.</p>`;
+  let h=picker();
   if(isOff(day))return h+offBox(D)+`<div class="wnavbot">${weekNav()}</div>`;
   const ls=dayLessons(day);
   const filled=ls.filter(x=>x.prev&&hasPrep(x.prev.id)).length;
@@ -1749,11 +1760,9 @@ document.addEventListener('keydown',e=>{if(e.target.id==='qe-in'&&e.key==='Enter
 
 let sheetMode=null;
 function openPrep(){sheetMode='prep';
-  sheet.innerHTML=`<div class="sheet-wrap" data-close><div class="sheet wide" role="dialog" aria-modal="true" aria-label="Подготовка"><div class="grab"></div>
-    <div class="sheet-head"><div><div class="cls" style="font-size:24px">Подготовка</div><div class="sub">что подготовить и домашнее задание с прошлых уроков</div></div><button class="btn primary" data-close>Свернуть</button></div>
-    <div id="prepbody">${renderPrep()}</div>
-    <button class="btn primary donebtn" data-close>Свернуть</button><div style="height:64px" aria-hidden="true"></div></div></div>
-    <button class="prepfab" id="prepsched" aria-label="Открыть расписание"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span>Расписание</span></button>`;
+  sheet.innerHTML=`<div class="sheet-wrap" data-close><div class="sheet wide prepsheet" role="dialog" aria-modal="true" aria-label="Подготовка"><div class="grab"></div>
+    <div class="sheet-head"><div><div class="cls" style="font-size:24px">Подготовка</div><div class="sub">заметки с прошлых уроков</div></div><div class="ph-r"><button class="schedfab inhead" id="prepsched" aria-label="Открыть расписание"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></button><button class="btn primary" data-close>Свернуть</button></div></div>
+    <div id="prepbody">${renderPrep()}</div></div></div>`;
   sheet.hidden=false;document.body.style.overflow='hidden';}
 let schedWhich='my';
 function openSched(which){
