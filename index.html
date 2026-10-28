@@ -849,6 +849,8 @@ header.top,header.top::before{background:#FFFFFF!important}
 @media (max-width:520px){#view .lgrid .lt-k{display:none}}
 
 .from-prev.fpstatic{background:#FFF7D6!important;border:1px solid #F3E3A3!important}
+
+#eyebrow{white-space:nowrap}
 </style>
 
 <div class="app">
@@ -1129,7 +1131,7 @@ function renderWeek(){
   const D=byIso[day]; if(isOff(day))return modeBar()+picker()+offBox(D);
   const lsAll=dayLessons(day,true), ls=lsAll.filter(x=>!isCancel(x));
   const items=[...lsAll.map(x=>({l:x.l,h:accRow(x)})),...EXTRA.filter(e=>e.wd===D.wd).map(e=>({l:e.l,h:extraCard(e)}))].sort((a,b)=>a.l-b.l);
-  return modeBar()+picker()+`<p class="hint">${WFULL[D.wd]}, ${D.label} · ${ls.length} ${plural(ls.length)}.</p>${lessonGrid(lsAll,D)}
+  return modeBar()+picker()+`${lessonGrid(lsAll,D)}
   ${xForm?xFormHtml(null,D):''}
   <div class="dayfoot"><button class="btn attach" data-xform="1">+ Замена или доп. урок</button><button class="linkbtn" data-toggle-off="${day}">Отметить день как выходной</button></div>`;
 }
@@ -1801,6 +1803,9 @@ function render(){
   syncExtras();scheduleDigest();
   if(tab==='classes'){tab='week';lessonsMode='classes'}
   document.getElementById('title').textContent=TITLES[tab];
+  try{const eb=document.getElementById('eyebrow');const n=new Date(),W=['Воскресенье','Понедельник','Вторник','Среда','Четверг','Пятница','Суббота'],M=['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+    if(tab==='week'&&byIso[day]){const [y,m,d]=day.split('-').map(Number),dt=new Date(y,m-1,d);let t=`${innerWidth<480?['Вс','Пн','Вт','Ср','Чт','Пт','Сб'][dt.getDay()]:W[dt.getDay()]}, ${d} ${M[m-1]}`;if(!isOff(day)){const c=dayLessons(day,true).filter(x=>!isCancel(x)).length;t+=` · ${c} ${plural(c)}`}eb.textContent=t}
+    else eb.textContent=`${W[n.getDay()]}, ${n.getDate()} ${M[n.getMonth()]}`}catch(e){}
   if(lastTab!==tab){view.classList.remove('enter');void view.offsetWidth;view.classList.add('enter');lastTab=tab}
   try{view.innerHTML=tab==='tasks'?renderTasks():tab==='week'?renderWeek():tab==='prep'?renderPrep():tab==='ktp'?renderKtp():renderKr()}
   catch(err){console.error(err);view.innerHTML=`<div class="kr-card"><b>Этот раздел не открылся</b><p class="hint">Записи сохранены. Сообщите Claude текст ошибки: ${esc(err&&err.message||err)}</p></div>`}
@@ -1827,6 +1832,7 @@ function lessonFieldsBase(id){const x=byId[id];if(x.extra&&xEditId===id){const e
     ${x.prev?`<div class="from-prev fpstatic"><b>Прошлый урок · ${when(x.prev)}</b><div class="fpbody">${prevTxt?prevTxt:'<span style="color:var(--muted);opacity:.7">ничего не записано</span>'}</div></div>`:''}
     ${[['done','Заметки','']].map(([k,lab,ph])=>`<div class="field f-${k}"><label for="f-${k}-${id}">${lab}</label><textarea id="f-${k}-${id}" data-k="${k}" data-lid="${id}" rows="1" placeholder="${ph}">${esc(get(id,k))}</textarea>${k==='done'&&get(id,'files').length?`<div class="lfiles" data-lf="${id}">${fileChips(get(id,'files'),'l:'+id)}</div>`:''}</div>`).join('')}`;
 }
+let focusNote=false;
 function openSheet(id){
   sheetMode=null;
   if(expId===id){expId=null;render()}
@@ -1842,7 +1848,7 @@ function openSheet(id){
   </div></div>`;
   sheet.hidden=false; document.body.style.overflow='hidden';
   sheet.querySelectorAll('textarea').forEach(grow);
-  const ta=sheet.querySelector('textarea[data-k="done"]');if(ta){try{ta.focus({preventScroll:true});const n=ta.value.length;ta.setSelectionRange(n,n)}catch(e){}}
+  const ta=focusNote?sheet.querySelector('textarea[data-k="done"]'):null;focusNote=false;if(ta){try{ta.focus({preventScroll:true});const n=ta.value.length;ta.setSelectionRange(n,n)}catch(e){}}
 }
 document.addEventListener('input',e=>{const r2=e.target.closest&&e.target.closest('[data-room2]');if(r2){const id=r2.dataset.room2;data[id]={...(data[id]||{}),room2:r2.value.trim()};saveLesson(id);return}});
 document.addEventListener('input',e=>{const t=e.target;if(!t.matches||!t.matches('textarea[data-k][data-lid]'))return;const id=t.dataset.lid;data[id]={...(data[id]||{}),[t.dataset.k]:t.value};grow(t);saveLesson(id);
@@ -1904,7 +1910,7 @@ document.addEventListener('click',e=>{
   const xf=e.target.closest('[data-xform]'); if(xf){xForm=xf.dataset.xform==='1';render();if(xForm){const el=document.getElementById('x-cls');if(el)el.focus()}return}
   const cx=e.target.closest('[data-cancel]'); if(cx){const id=cx.dataset.cancel;const v=isCancel(byId[id])?'':'cancel';data[id]={...(data[id]||{}),chg:v};saveLesson(id);relink();render();toast(v?'Урок отменён, подготовка перенесена на следующий':'Урок возвращён');return}
   const xd=e.target.closest('[data-xdel]'); if(xd){const id=xd.dataset.xdel;const idx=kr.extras.findIndex(x=>x.id===id);if(idx<0)return;const [it]=kr.extras.splice(idx,1);if(expId===id)expId=null;saveKr(true);if(!sheet.hidden)closeSheet();else render();toast('Замена удалена',()=>{kr.extras.splice(idx,0,it);saveKr(true);render()});return}
-  const ac=e.target.closest('[data-acc]'); if(ac){expId=null;ui.exp=null;openSheet(ac.dataset.acc);return}
+  const ac=e.target.closest('[data-acc]'); if(ac){expId=null;ui.exp=null;focusNote=true;openSheet(ac.dataset.acc);return}
   const o=e.target.closest('[data-open]'); if(o){openSheet(o.dataset.open);return}
   if(e.target.matches('[data-close]')){closeSheet();return}
   const tg=e.target.closest('[data-toggle-off]'); if(tg){const d=tg.dataset.toggleOff;off.has(d)?off.delete(d):off.add(d);relink();saveOff();render();return}
