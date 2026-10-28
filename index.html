@@ -1773,7 +1773,7 @@ function changeRow(id){const x=byId[id];const c=isCancel(x);
   return `<div class="chgrow"><button type="button" class="chgbtn ${c?'on':''}" data-cancel="${id}" aria-pressed="${c}">${c?'Урок отменён · вернуть':'Отменить урок'}</button>${x.extra?`<button type="button" class="chgbtn" data-xedit="${id}">Изменить замену</button><button type="button" class="chgbtn" data-xdel="${id}">Удалить замену</button>`:journalBtn(x)}</div>`}
 function lessonFields(id){if(xEditId===id)return lessonFieldsBase(id);return lessonFieldsBase(id)+`<div class="lfoot">${copyBlock(id)}${changeRow(id)}</div>`}
 function lessonFieldsBase(id){const x=byId[id];if(x.extra&&xEditId===id){const e=kr.extras.find(z=>z.id===id);if(e)return changeRow(id)+xFormHtml(e)}const prevTxt=x.prev&&hasPrep(x.prev.id)?prepBlocks(x.prev.id):'';
-  return `<div class="weeks marks" role="group" aria-label="Тип урока">${[['','Обычный'],['sr','Самостоятельная'],['kr','Контрольная']].map(([m,l])=>`<button class="wk" data-mark="${m}" data-lid="${id}" aria-pressed="${get(id,'mark')===m}">${l}</button>`).join('')}</div>
+  return `
     ${x.prev?`<div class="from-prev fpstatic"><b>Прошлый урок · ${when(x.prev)}</b><div class="fpbody">${prevTxt?prevTxt:'<span style="color:var(--muted);opacity:.7">ничего не записано</span>'}</div></div>`:''}
     ${[['done','Заметки','']].map(([k,lab,ph])=>`<div class="field f-${k}"><label for="f-${k}-${id}">${lab}</label><textarea id="f-${k}-${id}" data-k="${k}" data-lid="${id}" rows="1" placeholder="${ph}">${esc(get(id,k))}</textarea>${k==='done'&&get(id,'files').length?`<div class="lfiles" data-lf="${id}">${fileChips(get(id,'files'),'l:'+id)}</div>`:''}</div>`).join('')}`;
 }
