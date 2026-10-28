@@ -817,6 +817,11 @@ header.top,header.top::before{background:#FFFFFF!important}
 @media (min-width:860px){.sheet.schedsheet{max-width:874px}.schedsheet>*{zoom:1.15}}
 @media (min-width:1000px){.sheet.schedsheet{max-width:988px}.schedsheet>*{zoom:1.3}}
 @media (min-width:1200px){.sheet.schedsheet{max-width:1140px}.schedsheet>*{zoom:1.5}}
+
+:root,:root[data-theme="light"]{--accent:#3A8DDE;--accent-soft:#DCEBFB;--fill:#B8DBFA;--fill-ink:#0F3561}
+:is(.day[aria-pressed="true"],.tab[aria-selected="true"],.btn.primary,.sbtn.go,.wk[aria-pressed="true"].krtab,.segb[aria-selected="true"],.fab,.prepfab,.stag.s-work,.ktag,.krbig,.tt thead th.today,.tt.horiz tbody th.today,.ttc.mine){background:var(--fill)!important;color:var(--fill-ink)!important}
+:is(.tt thead th.today,.tt.horiz tbody th.today,.ttc.mine) :is(b,span){color:var(--fill-ink)!important}
+.day[aria-pressed="true"] *,.tab[aria-selected="true"] *,.btn.primary *{color:var(--fill-ink)!important}
 </style>
 
 <div class="app">
@@ -1796,6 +1801,7 @@ function openSheet(id){
   </div></div>`;
   sheet.hidden=false; document.body.style.overflow='hidden';
   sheet.querySelectorAll('textarea').forEach(grow);
+  const ta=sheet.querySelector('textarea[data-k="done"]');if(ta){try{ta.focus({preventScroll:true});const n=ta.value.length;ta.setSelectionRange(n,n)}catch(e){}}
 }
 document.addEventListener('input',e=>{const r2=e.target.closest&&e.target.closest('[data-room2]');if(r2){const id=r2.dataset.room2;data[id]={...(data[id]||{}),room2:r2.value.trim()};saveLesson(id);return}});
 document.addEventListener('input',e=>{const t=e.target;if(!t.matches||!t.matches('textarea[data-k][data-lid]'))return;const id=t.dataset.lid;data[id]={...(data[id]||{}),[t.dataset.k]:t.value};grow(t);saveLesson(id);
