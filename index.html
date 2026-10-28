@@ -813,6 +813,10 @@ header.top,header.top::before{background:#FFFFFF!important}
 .ltile.is-now .lt-top b{color:var(--ok)}
 @media (min-width:700px){.lgrid{gap:10px}.ltile{min-height:132px}.lt-b{padding:12px}.lt-cls{font-size:24px}.lt-sub{font-size:13px}.lt-top b{font-size:19px}.lt-top span{font-size:12.5px}.lt-j{font-size:13px;padding:7px 4px}}
 .lj-l{display:none}@media (min-width:700px){.lj-s{display:none}.lj-l{display:inline}}
+
+@media (min-width:860px){.sheet.schedsheet{max-width:874px}.schedsheet>*{zoom:1.15}}
+@media (min-width:1000px){.sheet.schedsheet{max-width:988px}.schedsheet>*{zoom:1.3}}
+@media (min-width:1200px){.sheet.schedsheet{max-width:1140px}.schedsheet>*{zoom:1.5}}
 </style>
 
 <div class="app">
@@ -1784,8 +1788,7 @@ function openSheet(id){
   const x=byId[id]; if(!x)return;
   sheet.innerHTML=`<div class="sheet-wrap" data-close><div class="sheet" role="dialog" aria-modal="true" aria-label="${x.cls} ${x.sub}">
     <div class="grab"></div>
-    <div class="sheet-head"><div><div class="cls">${x.cls}</div><div class="sub">${x.sub} · ${WFULL[x.D.wd]}, ${x.D.label} · ${x.l} урок, ${TIMES[x.l]}</div>
-      <div class="meta" style="display:flex;gap:6px;margin-top:8px"><span class="pill ${isAway(roomOf(x))?'room302':''}">каб. ${roomOf(x)}</span>${x.n>1?`<span class="pill">${x.k+1} из ${x.n}</span>`:''}</div></div>
+    <div class="sheet-head"><div><div class="cls">${x.cls}</div></div>
       <button class="btn primary" data-close>Готово</button></div>
     ${lessonFields(id)}
     <div class="nav-row">${x.prev?`<button class="btn" data-open="${x.prev.id}">← ${x.prev.D.wd} ${x.prev.D.label}</button>`:'<span></span>'}${x.next?`<button class="btn" data-open="${x.next.id}">${x.next.D.wd} ${x.next.D.label} →</button>`:''}</div>
