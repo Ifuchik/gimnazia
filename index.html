@@ -1090,10 +1090,10 @@ function xFormHtml(e,D){const v=e||{l:'',cls:'',sub:'',r:'',note:''};
     <input class="kr-in" id="x-note" placeholder="Заметка: за кого замена, тема" autocomplete="off" value="${esc(v.note)}">
     <div class="add" style="margin:0"><button class="btn primary" type="submit">${e?'Сохранить':'Добавить урок'}</button><button type="button" class="linkbtn" ${e?'data-xedit="0"':'data-xform="0"'}>Отмена</button></div></form>`}
 function renderWeek(){
-  const D=byIso[day]; if(isOff(day))return modeBar()+quickEntry()+picker()+offBox(D)+`<div class="wnavbot">${weekNav()}</div>`;
+  const D=byIso[day]; if(isOff(day))return modeBar()+picker()+offBox(D)+`<div class="wnavbot">${weekNav()}</div>`;
   const lsAll=dayLessons(day,true), ls=lsAll.filter(x=>!isCancel(x));
   const items=[...lsAll.map(x=>({l:x.l,h:accRow(x)})),...EXTRA.filter(e=>e.wd===D.wd).map(e=>({l:e.l,h:extraCard(e)}))].sort((a,b)=>a.l-b.l);
-  return modeBar()+quickEntry()+picker()+`<p class="hint">${WFULL[D.wd]}, ${D.label} · ${ls.length} ${plural(ls.length)}.</p>${lessonGrid(lsAll,D)}
+  return modeBar()+picker()+`<p class="hint">${WFULL[D.wd]}, ${D.label} · ${ls.length} ${plural(ls.length)}.</p>${lessonGrid(lsAll,D)}
   <div class="legend"><span><i class="sw"></i>другой кабинет, не 03-03</span><span><i class="dt"></i>есть заметка</span></div>
   ${xForm?xFormHtml(null,D):''}
   <div class="dayfoot"><button class="btn attach" data-xform="1">+ Замена или доп. урок</button><button class="btn attach" data-export>Неделя в Word</button><button class="linkbtn" data-toggle-off="${day}">Отметить день как выходной</button></div><div class="wnavbot">${weekNav()}</div>`;
