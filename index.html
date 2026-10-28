@@ -822,6 +822,8 @@ header.top,header.top::before{background:#FFFFFF!important}
 :is(.day[aria-pressed="true"],.tab[aria-selected="true"],.btn.primary,.sbtn.go,.wk[aria-pressed="true"].krtab,.segb[aria-selected="true"],.fab,.prepfab,.stag.s-work,.ktag,.krbig,.tt thead th.today,.tt.horiz tbody th.today,.ttc.mine){background:var(--fill)!important;color:var(--fill-ink)!important}
 :is(.tt thead th.today,.tt.horiz tbody th.today,.ttc.mine) :is(b,span){color:var(--fill-ink)!important}
 .day[aria-pressed="true"] *,.tab[aria-selected="true"] *,.btn.primary *{color:var(--fill-ink)!important}
+
+@media (min-width:900px){html body{background-color:#FFFFFF!important;background-image:linear-gradient(rgba(58,141,222,.10) 1px,transparent 1px),linear-gradient(90deg,rgba(58,141,222,.10) 1px,transparent 1px)!important;background-size:24px 24px!important;background-attachment:fixed!important}header.top{background:transparent!important}header.top::before{background:rgba(255,255,255,.82)!important;left:-100vw!important;right:-100vw!important}}
 </style>
 
 <div class="app">
@@ -1671,8 +1673,7 @@ document.addEventListener('click',e=>{const j=e.target.closest('[data-jid]');if(
   if(hwAskable(x)&&get(x.id,'hwp')){e.preventDefault();e.stopImmediatePropagation();const pop=document.getElementById('popup');
     pop.innerHTML=`<div class="popwrap" data-hwclose><div class="popbox" role="dialog" aria-modal="true" aria-label="Выложили д/з?">
       <div class="poptitle">Выложили д/з?</div><div class="sub">${x.cls}, ${x.sub.toLowerCase()} · ${WDS[wdOf(x.iso)]} ${dm(x.iso)}, ${x.l} урок</div>
-      <div class="add" style="margin:6px 0 0"><button class="btn primary" data-hwclose>Да</button><button class="btn" data-hwundo="${x.id}">Нет</button></div>
-      <p class="hint" style="margin:0">«Нет» снова сделает кнопку красной, и урок вернётся в список «Выложить д/з».</p></div></div>`;pop.hidden=false;return}
+      <div class="add" style="margin:6px 0 0"><button class="btn" data-hwundo="${x.id}">Нет</button></div></div></div>`;pop.hidden=false;return}
   if(hwAskable(x)&&!get(x.id,'hwp')){setHwp(x.id,true);setTimeout(()=>{const y=scrollY;render();scrollTo(0,y);if(!sheet.hidden&&!sheetMode&&ui.sheet)openSheet(ui.sheet)},400)}},true);
 function maybeAskHw(force){if(document.hidden||!hwAsk)return;if(!force&&!hwAsk.left&&Date.now()-hwAsk.t<1500)return;if(Date.now()-hwAsk.t<800)return;const id=hwAsk.id;hwAsk=null;const x=byId[id];if(!x||get(id,'hwp'))return;
   const pop=document.getElementById('popup');pop.innerHTML=`<div class="popwrap" data-hwclose><div class="popbox" role="dialog" aria-modal="true" aria-label="Д/з выложено?">
