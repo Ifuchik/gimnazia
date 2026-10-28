@@ -830,6 +830,8 @@ header.top,header.top::before{background:#FFFFFF!important}
 .schedfab{bottom:calc(68px + env(safe-area-inset-bottom,0px))!important}.scrollfab{bottom:calc(68px + env(safe-area-inset-bottom,0px))!important;right:calc(max(14px,env(safe-area-inset-right,0px)) + 50px)!important}
 .app{padding-bottom:calc(136px + env(safe-area-inset-bottom,0px))!important}}
 .schedfab{background:#FFD43B!important;color:#3A2A00!important;box-shadow:0 4px 14px rgba(120,90,0,.28)!important}
+
+.lgrid+.dayfoot,.lgrid~.dayfoot{margin-top:70vh!important;margin-top:70svh!important}
 </style>
 
 <div class="app">
@@ -1035,7 +1037,7 @@ function accRow(x){const open=false;
   return `<div class="acc ${isCancel(x)?'cancelled':''} ${x.extra?'extra':''} ${isAway(roomOf(x))?'r302':''} ${open?'open':''}" data-accid="${x.id}">
     <button class="acchead" data-acc="${x.id}" aria-expanded="${open}">
       <span class="num"><b>${x.l}</b><span>${t0(x.l)}</span></span>
-      <span class="what"><span class="acl"><b class="cls">${x.cls}</b><span class="sub">${x.sub}</span></span><span class="meta"><span class="pill ${isAway(roomOf(x))?'room302':''}">каб. ${roomOf(x)}</span>${x.n>1?`<span class="pill">${x.k+1} из ${x.n}</span>`:''}${nextPill(x)}${journalUrl(x)?`<span class="pill jpill" role="link" tabindex="0" data-jurl="${journalUrl(x)}" data-jid="${x.id}" style="background:${get(x.id,'hwp')?'#159A57':'#E5322D'};color:#fff;font-weight:700">${get(x.id,'hwp')?'✓ Оценки/дз':'Оценки/дз'}</span>`:''}${markPill(x.id)}${isCancel(x)?'<span class="pill cx">Отменён</span>':''}${x.extra?'<span class="pill xt">Замена</span>':''}${data[x.id]&&data[x.id].room2?'<span class="pill">кабинет изменён</span>':''}</span></span>
+      <span class="what"><span class="acl"><b class="cls">${x.cls}</b><span class="sub">${x.sub}</span></span><span class="meta"><span class="pill ${isAway(roomOf(x))?'room302':''}">каб. ${roomOf(x)}</span>${x.n>1?`<span class="pill">${x.k+1} из ${x.n}</span>`:''}${nextPill(x)}${journalUrl(x)?`<span class="pill jpill" role="link" tabindex="0" data-jurl="${journalUrl(x)}" data-jid="${x.id}" style="background:${get(x.id,'hwp')?'#159A57':'#E5322D'};color:#fff;font-weight:700">${get(x.id,'hwp')?'✓ Журнал':'Журнал'}</span>`:''}${markPill(x.id)}${isCancel(x)?'<span class="pill cx">Отменён</span>':''}${x.extra?'<span class="pill xt">Замена</span>':''}${data[x.id]&&data[x.id].room2?'<span class="pill">кабинет изменён</span>':''}</span></span>
       ${dots(x.id)}<span class="go accgo" aria-hidden="true">›</span></button>
     ${open?`<div class="accpanel">${lessonFields(x.id)}<div class="accfoot"><button class="linkbtn" data-open="${x.id}">Открыть во весь экран</button><button class="btn" data-acc="${x.id}">Свернуть</button></div></div>`:''}</div>`;
 }
@@ -1046,7 +1048,7 @@ function lTile(x){const away=isAway(roomOf(x)),ju=journalUrl(x),ok=get(x.id,'hwp
     <span class="lt-top"><b>${x.l}</b><span>${t0(x.l)}</span>${filled?'<i class="lt-dot"></i>':''}</span>
     <b class="lt-cls">${x.cls}</b><span class="lt-sub">${subTile(x.sub)}</span>
     <span class="lt-tags">${away?`<span class="lt-room">${roomOf(x)}</span>`:''}${x.n>1?`<span class="lt-k">${x.k+1}/${x.n}</span>`:''}${isCancel(x)?'<span class="lt-x">отменён</span>':''}${x.extra?'<span class="lt-x">замена</span>':''}</span>
-    ${ju&&!isCancel(x)?`<span class="lt-j ${ok?'ok':''}" role="link" tabindex="0" data-jurl="${ju}" data-jid="${x.id}"><span class="lj-s">${ok?'✓ Оц/дз':'Оц/дз'}</span><span class="lj-l">${ok?'✓ Оценки/дз':'Оценки/дз'}</span></span>`:''}</button></div>`}
+    ${ju&&!isCancel(x)?`<span class="lt-j ${ok?'ok':''}" role="link" tabindex="0" data-jurl="${ju}" data-jid="${x.id}"><span class="lj-s">Журнал</span><span class="lj-l">${ok?'✓ Журнал':'Журнал'}</span></span>`:''}</button></div>`}
 function eTile(e){return `<div class="ltile muted"><div class="lt-b" style="cursor:default"><span class="lt-top"><b>${e.l}</b><span>${t0(e.l)}</span></span><b class="lt-cls">${e.cls}</b><span class="lt-sub">${subTile(e.sub)}</span><span class="lt-tags">${isAway(e.r)?`<span class="lt-room">${e.r}</span>`:''}</span></div></div>`}
 function lessonGrid(lsAll,D){const by={};lsAll.forEach(x=>(by[x.l]=by[x.l]||[]).push(lTile(x)));EXTRA.filter(e=>e.wd===D.wd).forEach(e=>(by[e.l]=by[e.l]||[]).push(eTile(e)));
   let h='';for(let n=1;n<=12;n++){h+=by[n]?(by[n].length>1?`<div class="lslot multi">${by[n].join('')}</div>`:by[n][0]):`<div class="ltile empty"><span class="lt-top"><b>${n}</b><span>${t0(n)}</span></span></div>`}
@@ -1107,12 +1109,12 @@ function xFormHtml(e,D){const v=e||{l:'',cls:'',sub:'',r:'',note:''};
     <input class="kr-in" id="x-note" placeholder="Заметка: за кого замена, тема" autocomplete="off" value="${esc(v.note)}">
     <div class="add" style="margin:0"><button class="btn primary" type="submit">${e?'Сохранить':'Добавить урок'}</button><button type="button" class="linkbtn" ${e?'data-xedit="0"':'data-xform="0"'}>Отмена</button></div></form>`}
 function renderWeek(){
-  const D=byIso[day]; if(isOff(day))return modeBar()+picker()+offBox(D)+`<div class="wnavbot">${weekNav()}</div>`;
+  const D=byIso[day]; if(isOff(day))return modeBar()+picker()+offBox(D);
   const lsAll=dayLessons(day,true), ls=lsAll.filter(x=>!isCancel(x));
   const items=[...lsAll.map(x=>({l:x.l,h:accRow(x)})),...EXTRA.filter(e=>e.wd===D.wd).map(e=>({l:e.l,h:extraCard(e)}))].sort((a,b)=>a.l-b.l);
   return modeBar()+picker()+`<p class="hint">${WFULL[D.wd]}, ${D.label} · ${ls.length} ${plural(ls.length)}.</p>${lessonGrid(lsAll,D)}
   ${xForm?xFormHtml(null,D):''}
-  <div class="dayfoot"><button class="btn attach" data-xform="1">+ Замена или доп. урок</button><button class="btn attach" data-export>Неделя в Word</button><button class="linkbtn" data-toggle-off="${day}">Отметить день как выходной</button></div><div class="wnavbot">${weekNav()}</div>`;
+  <div class="dayfoot"><button class="btn attach" data-xform="1">+ Замена или доп. урок</button><button class="linkbtn" data-toggle-off="${day}">Отметить день как выходной</button></div>`;
 }
 function prepBlocks(id,max){const p=get(id,'done').trim(),h='';const cut=t=>max&&t.length>max?t.slice(0,max)+'…':t;
   return (p?`<div class="prepline"><span class="ptag">Заметки</span><span>${esc(cut(p))}</span></div>`:'')+(h?`<div class="hwline"><span class="hwtag">Д/з</span><span>${esc(cut(h))}</span></div>`:'')}
@@ -1790,7 +1792,7 @@ const JOURNAL_ID={'5Ж|Математика':14,'5К|Математика':38,'7
 ['8В','8Г','8Д','8О'].forEach(c=>{JOURNAL_ID[c+'|Алгебра']=2;JOURNAL_ID[c+'|Геометрия']=14;JOURNAL_ID[c+'|Вероятность и статистика']=118});
 function journalUrl(x){const lid=JOURNAL_ID[x.cls+'|'+x.sub];if(!lid)return '';const m=moduleOf(x.iso)||moduleOf(todayIso)||1;const sp=['I','II','III'][TRIM(m)-1]+' триместр';
   return 'https://class.sirius-ft.ru/journal-app/page.journal/class.'+encodeURIComponent(x.cls)+'/lesson_id.'+lid+'/sp.'+encodeURIComponent(sp)}
-function journalBtn(x){const u=journalUrl(x);return u?`<a class="chgbtn jbtn ${get(x.id,'hwp')?'done':''}" href="${u}" target="_blank" rel="noopener" data-jid="${x.id}">${get(x.id,'hwp')?'✓ Оценки/дз':'Оценки/дз'}</a>`:''}
+function journalBtn(x){const u=journalUrl(x);return u?`<a class="chgbtn jbtn ${get(x.id,'hwp')?'done':''}" href="${u}" target="_blank" rel="noopener" data-jid="${x.id}">${get(x.id,'hwp')?'✓ Журнал':'Журнал'}</a>`:''}
 function changeRow(id){const x=byId[id];const c=isCancel(x);
   return `<div class="chgrow"><button type="button" class="chgbtn ${c?'on':''}" data-cancel="${id}" aria-pressed="${c}">${c?'Урок отменён · вернуть':'Отменить урок'}</button>${x.extra?`<button type="button" class="chgbtn" data-xedit="${id}">Изменить замену</button><button type="button" class="chgbtn" data-xdel="${id}">Удалить замену</button>`:journalBtn(x)}</div>`}
 function lessonFields(id){if(xEditId===id)return lessonFieldsBase(id);return lessonFieldsBase(id)+`<div class="lfoot">${copyBlock(id)}${changeRow(id)}</div>`}
