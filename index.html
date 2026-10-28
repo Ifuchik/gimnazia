@@ -2027,6 +2027,14 @@ function fitGrid(){const g=document.querySelector('#view .lgrid');if(!g)return;g
   if(scrollY>40)return;
   let h=Math.floor((avail-2*gap)/3);h=Math.max(96,Math.min(innerWidth>=700?170:140,h));g.style.gridAutoRows=h+'px'}
 {let raf2=0;const run=()=>{cancelAnimationFrame(raf2);raf2=requestAnimationFrame(fitGrid)};new MutationObserver(run).observe(document.getElementById('view'),{childList:true});addEventListener('resize',run);setTimeout(run,300)}
+
+// iOS Safari: окно урока поднимается над клавиатурой
+(function(){const vv=window.visualViewport;if(!vv)return;
+  function fit(){const w=document.querySelector('#sheet .sheet-wrap');if(!w)return;const sh=w.querySelector('.sheet');const kb=window.innerHeight-vv.height>120;
+    if(kb){w.style.top=vv.offsetTop+'px';w.style.height=vv.height+'px';w.style.bottom='auto';w.style.alignItems='flex-end';if(sh)sh.style.maxHeight=(vv.height-6)+'px';
+      const a=document.activeElement;if(a&&sh&&sh.contains(a)&&a.matches('textarea,input')){const r=a.getBoundingClientRect(),sr=sh.getBoundingClientRect();if(r.bottom>sr.bottom-8||r.top<sr.top)sh.scrollTop+=r.top-sr.top-60}}
+    else{w.style.top='';w.style.height='';w.style.bottom='';w.style.alignItems='';if(sh)sh.style.maxHeight=''}}
+  vv.addEventListener('resize',fit);vv.addEventListener('scroll',fit);document.addEventListener('focusin',()=>setTimeout(fit,60));document.addEventListener('focusout',()=>setTimeout(fit,120))})();
 // подсветка урока, который идёт прямо сейчас
 function markNow(){const n=new Date(),iso=`${n.getFullYear()}-${pad(n.getMonth()+1)}-${pad(n.getDate())}`,m=n.getHours()*60+n.getMinutes();
   const mm=s=>{const[h,mi]=s.trim().split(':');return +h*60+ +mi};
