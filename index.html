@@ -814,9 +814,6 @@ header.top,header.top::before{background:#FFFFFF!important}
 @media (min-width:700px){.lgrid{gap:10px}.ltile{min-height:132px}.lt-b{padding:12px}.lt-cls{font-size:24px}.lt-sub{font-size:13px}.lt-top b{font-size:19px}.lt-top span{font-size:12.5px}.lt-j{font-size:13px;padding:7px 4px}}
 .lj-l{display:none}@media (min-width:700px){.lj-s{display:none}.lj-l{display:inline}}
 
-@media (min-width:860px){.sheet.schedsheet{max-width:874px}.schedsheet>*{zoom:1.15}}
-@media (min-width:1000px){.sheet.schedsheet{max-width:988px}.schedsheet>*{zoom:1.3}}
-@media (min-width:1200px){.sheet.schedsheet{max-width:1140px}.schedsheet>*{zoom:1.5}}
 
 :root,:root[data-theme="light"]{--accent:#3A8DDE;--accent-soft:#DCEBFB;--fill:#B8DBFA;--fill-ink:#0F3561}
 :is(.day[aria-pressed="true"],.tab[aria-selected="true"],.btn.primary,.sbtn.go,.wk[aria-pressed="true"].krtab,.segb[aria-selected="true"],.fab,.prepfab,.stag.s-work,.ktag,.krbig,.tt thead th.today,.tt.horiz tbody th.today,.ttc.mine){background:var(--fill)!important;color:var(--fill-ink)!important}
@@ -825,12 +822,12 @@ header.top,header.top::before{background:#FFFFFF!important}
 
 @media (min-width:900px){html body{background-color:#FFFFFF!important;background-image:linear-gradient(rgba(58,141,222,.10) 1px,transparent 1px),linear-gradient(90deg,rgba(58,141,222,.10) 1px,transparent 1px)!important;background-size:24px 24px!important;background-attachment:fixed!important}header.top{background:transparent!important}header.top::before{background:rgba(255,255,255,.82)!important;left:-100vw!important;right:-100vw!important}}
 
-@media (min-width:700px){.tabs{padding-top:4px!important;padding-bottom:calc(6px + env(safe-area-inset-bottom,0px))!important}.tabs nav{max-width:360px!important;padding:3px!important;gap:2px!important;border-radius:18px!important}.tab{padding:4px 2px 3px!important;border-radius:14px!important;gap:1px!important}.tab .ti{width:18px!important;height:18px!important}.tab .tl{font-size:9.5px!important}.tab .badge{transform:scale(.85)}.app{padding-bottom:calc(76px + env(safe-area-inset-bottom,0px))!important}}
+@media (min-width:700px){.tabs{padding-top:4px!important;padding-bottom:calc(6px + env(safe-area-inset-bottom,0px))!important}.tabs nav{max-width:360px!important;padding:3px!important;gap:2px!important;border-radius:18px!important}.tab{padding:4px 2px 3px!important;border-radius:14px!important;gap:1px!important}.tab .ti{width:18px!important;height:18px!important}.tab .tl{font-size:9.5px!important}.tab .badge{transform:scale(.85)}.app{padding-bottom:calc(130px + env(safe-area-inset-bottom,0px))!important}}
 
 .days{padding:4px 4px 6px!important;margin-left:-4px!important;margin-right:-4px!important;margin-top:2px}
 
 @media (max-width:699px){.tabs nav{padding:4px!important;gap:3px!important;border-radius:20px!important}.tab{padding:5px 2px 4px!important;border-radius:15px!important;gap:1px!important}.tab .ti{width:20px!important;height:20px!important}.tab .tl{font-size:10px!important}
-.schedfab{bottom:calc(80px + env(safe-area-inset-bottom,0px))!important}.scrollfab{bottom:calc(80px + env(safe-area-inset-bottom,0px))!important;right:calc(max(14px,env(safe-area-inset-right,0px)) + 50px)!important}
+.schedfab{bottom:calc(68px + env(safe-area-inset-bottom,0px))!important}.scrollfab{bottom:calc(68px + env(safe-area-inset-bottom,0px))!important;right:calc(max(14px,env(safe-area-inset-right,0px)) + 50px)!important}
 .app{padding-bottom:calc(136px + env(safe-area-inset-bottom,0px))!important}}
 .schedfab{background:#FFD43B!important;color:#3A2A00!important;box-shadow:0 4px 14px rgba(120,90,0,.28)!important}
 </style>
@@ -1738,8 +1735,15 @@ function openSched(which){
     <div class="weeks" role="group" aria-label="Чьё расписание"><button class="wk" data-sched="my" aria-pressed="${schedWhich==='my'}">Моё</button><button class="wk" data-sched="5zh" aria-pressed="${schedWhich==='5zh'}">5Ж</button></div>${schedWhich==='my'?weekNav():''}
     <div class="kr-card" style="padding:4px 0">${inner}</div>
     <button class="btn primary donebtn" data-close>Свернуть</button></div></div>`;
-  sheet.hidden=false;document.body.style.overflow='hidden';
+  sheet.hidden=false;document.body.style.overflow='hidden';fitSched();
 }
+function fitSched(){const sh=sheet.querySelector('.schedsheet');if(!sh)return;const kids=[...sh.children];
+  kids.forEach(k=>k.style.zoom='');sh.style.maxWidth='';
+  if(innerWidth<860)return;
+  sh.style.maxWidth='760px';const H=sh.scrollHeight,pad=40;
+  let z=Math.min(1.5,(innerWidth*0.96)/760,(innerHeight*0.9-pad)/Math.max(1,H-pad));z=Math.max(0.8,Math.floor(z*100)/100);
+  sh.style.maxWidth=Math.round(760*z)+'px';kids.forEach(k=>k.style.zoom=z)}
+addEventListener('resize',()=>{if(!sheet.hidden&&sheetMode==='sched')fitSched()});
 function openStudent(i){
   const [nm,b,g]=STUDENTS[i];const [y,m,d]=b.split('-').map(Number);const L=slogOf(i);
   const sc=sheet.querySelector('.sheet');const keep=!sheet.hidden&&sheet.querySelector('#st-note')?sc.scrollTop:0;
