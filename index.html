@@ -832,6 +832,23 @@ header.top,header.top::before{background:#FFFFFF!important}
 .schedfab{background:#FFD43B!important;color:#3A2A00!important;box-shadow:0 4px 14px rgba(120,90,0,.28)!important}
 
 .lgrid+.dayfoot,.lgrid~.dayfoot{margin-top:70vh!important;margin-top:70svh!important}
+
+.pt-note{font-size:11.5px;line-height:1.3;color:var(--ink);margin-top:3px;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;white-space:pre-line;word-break:break-word}
+.ptile:not(.has) .pt-note{opacity:.45}
+.ptile.has{background:#FFF7D6}
+@media (min-width:700px){.pt-note{font-size:13px;-webkit-line-clamp:5}}
+
+.lt-line{display:flex;align-items:center;gap:4px;min-width:0;flex-wrap:nowrap;overflow:hidden}
+.lt-line .lt-sub{flex:0 1 auto;min-width:0}
+.lt-line .lt-tags{flex:0 0 auto;flex-wrap:nowrap}
+#view .lgrid .ltile{min-height:0;height:100%}
+#view .lgrid .lslot.multi{min-height:0}
+#view .lgrid .lt-b{gap:2px}
+
+.ltile{box-sizing:border-box}
+@media (max-width:520px){#view .lgrid .lt-k{display:none}}
+
+.from-prev.fpstatic{background:#FFF7D6!important;border:1px solid #F3E3A3!important}
 </style>
 
 <div class="app">
@@ -1046,8 +1063,8 @@ const subTile=s=>SUBT[s]||s;
 function lTile(x){const away=isAway(roomOf(x)),ju=journalUrl(x),ok=get(x.id,'hwp'),filled=get(x.id,'done').trim();
   return `<div class="ltile ${isCancel(x)?'cancelled':''} ${x.extra?'extra':''}" data-accid="${x.id}"><button class="lt-b" data-acc="${x.id}">
     <span class="lt-top"><b>${x.l}</b><span>${t0(x.l)}</span>${filled?'<i class="lt-dot"></i>':''}</span>
-    <b class="lt-cls">${x.cls}</b><span class="lt-sub">${subTile(x.sub)}</span>
-    <span class="lt-tags">${away?`<span class="lt-room">${roomOf(x)}</span>`:''}${x.n>1?`<span class="lt-k">${x.k+1}/${x.n}</span>`:''}${isCancel(x)?'<span class="lt-x">отменён</span>':''}${x.extra?'<span class="lt-x">замена</span>':''}</span>
+    <b class="lt-cls">${x.cls}</b><span class="lt-line"><span class="lt-sub">${subTile(x.sub)}</span>
+    <span class="lt-tags">${away?`<span class="lt-room">${roomOf(x)}</span>`:''}${x.n>1&&!away?`<span class="lt-k">${x.k+1}/${x.n}</span>`:''}${isCancel(x)?'<span class="lt-x">отменён</span>':''}${x.extra?'<span class="lt-x">замена</span>':''}</span></span>
     ${ju&&!isCancel(x)?`<span class="lt-j ${ok?'ok':''}" role="link" tabindex="0" data-jurl="${ju}" data-jid="${x.id}"><span class="lj-s">Журнал</span><span class="lj-l">${ok?'✓ Журнал':'Журнал'}</span></span>`:''}</button></div>`}
 function eTile(e){return `<div class="ltile muted"><div class="lt-b" style="cursor:default"><span class="lt-top"><b>${e.l}</b><span>${t0(e.l)}</span></span><b class="lt-cls">${e.cls}</b><span class="lt-sub">${subTile(e.sub)}</span><span class="lt-tags">${isAway(e.r)?`<span class="lt-room">${e.r}</span>`:''}</span></div></div>`}
 function lessonGrid(lsAll,D){const by={};lsAll.forEach(x=>(by[x.l]=by[x.l]||[]).push(lTile(x)));EXTRA.filter(e=>e.wd===D.wd).forEach(e=>(by[e.l]=by[e.l]||[]).push(eTile(e)));
@@ -1133,13 +1150,22 @@ function prepRow(x){
     <div class="prepbody">${!src?'<div class="empty">Первый урок в плане, записей до него нет</div>':txt?prepBlocks(src.id):'<div class="empty">К этому уроку ничего не записано</div>'}
     ${src?`<div class="from">${txt?'записано на уроке':'прошлый урок:'} ${when(src)}</div>`:''}</div></div>`;
 }
+function prepTile(x){const src=x.prev,t=src?(get(src.id,'done')||'').trim():'',away=isAway(roomOf(x));
+  return `<div class="ltile ptile ${t?'has':''}"><button class="lt-b" data-open="${src?src.id:x.id}">
+    <span class="lt-top"><b>${x.l}</b><span>${t0(x.l)}</span></span>
+    <b class="lt-cls">${x.cls}</b><span class="lt-sub">${subTile(x.sub)}</span>
+    ${away?`<span class="lt-tags"><span class="lt-room">${roomOf(x)}</span></span>`:''}
+    <span class="pt-note">${t?esc(t):'нет заметок'}</span></button></div>`}
+function prepGrid(ls){const by={};ls.forEach(x=>(by[x.l]=by[x.l]||[]).push(prepTile(x)));let h='';
+  for(let n=1;n<=12;n++)h+=by[n]?(by[n].length>1?`<div class="lslot multi">${by[n].join('')}</div>`:by[n][0]):`<div class="ltile empty"><span class="lt-top"><b>${n}</b><span>${t0(n)}</span></span></div>`;
+  return `<div class="lgrid">${h}</div>`}
 function renderPrep(){
   const D=byIso[day];
   let h=picker()+`<p class="hint">Здесь собраны заметки с предыдущего урока каждого класса, в том числе с прошлой недели.</p>`;
   if(isOff(day))return h+offBox(D)+`<div class="wnavbot">${weekNav()}</div>`;
   const ls=dayLessons(day);
   const filled=ls.filter(x=>x.prev&&hasPrep(x.prev.id)).length;
-  return h+`<div class="section-title">${WFULL[D.wd]}, ${D.label} <small>${filled} из ${ls.length} с записью</small></div><div class="list">${ls.map(prepRow).join('')}</div><div class="wnavbot">${weekNav()}</div>`;
+  return h+`<div class="section-title">${WFULL[D.wd]}, ${D.label} <small>${filled} из ${ls.length} с записью</small></div>${prepGrid(ls)}<div class="wnavbot">${weekNav()}</div>`;
 }
 let lessonsMode='days', jClass=0;
 try{const u=JSON.parse(localStorage.getItem(LS+'-lm')||'null');if(u){lessonsMode=u.m||'days';jClass=u.c||0}}catch(e){}
@@ -1978,6 +2004,15 @@ if(ui.sheet&&byId[ui.sheet])openSheet(ui.sheet);
   addEventListener('scroll',q,{passive:true});addEventListener('resize',q);new MutationObserver(q).observe(document.getElementById('view'),{childList:true,subtree:true});
   b.addEventListener('click',()=>{const max=document.documentElement.scrollHeight-innerHeight;scrollTo({top:up?0:max,behavior:'smooth'})});q()})();
 
+
+function fitGrid(){const g=document.querySelector('#view .lgrid');if(!g)return;g.style.gridAutoRows='';
+  const nav=document.querySelector('.tabs nav');const navTop=nav?nav.getBoundingClientRect().top:innerHeight;
+  const top=g.getBoundingClientRect().top+scrollY-scrollY;const gap=parseFloat(getComputedStyle(g).rowGap)||8;
+  const gr=g.getBoundingClientRect();let lim=navTop;['#fab','.scrollfab'].forEach(q=>{const f=document.querySelector(q);if(!f||f.hidden||getComputedStyle(f).display==='none')return;const r=f.getBoundingClientRect();if(r.width&&r.left<gr.right&&r.top<lim)lim=r.top});
+  const avail=lim-gr.top-10;
+  if(scrollY>40)return;
+  let h=Math.floor((avail-2*gap)/3);h=Math.max(96,Math.min(innerWidth>=700?170:140,h));g.style.gridAutoRows=h+'px'}
+{let raf2=0;const run=()=>{cancelAnimationFrame(raf2);raf2=requestAnimationFrame(fitGrid)};new MutationObserver(run).observe(document.getElementById('view'),{childList:true});addEventListener('resize',run);setTimeout(run,300)}
 // подсветка урока, который идёт прямо сейчас
 function markNow(){const n=new Date(),iso=`${n.getFullYear()}-${pad(n.getMonth()+1)}-${pad(n.getDate())}`,m=n.getHours()*60+n.getMinutes();
   const mm=s=>{const[h,mi]=s.trim().split(':');return +h*60+ +mi};
