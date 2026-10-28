@@ -875,7 +875,7 @@ header.top,header.top::before{background:#FFFFFF!important}
 <div class="tabs"><nav role="tablist">
   <button class="tab" role="tab" id="tab-tasks" data-tab="tasks"><svg class="ti" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11l2 2 4-4"/><rect x="4" y="4" width="16" height="16" rx="4"/></svg><span class="tl">Дела</span><span class="badge" id="tbadge" hidden></span></button>
   <button class="tab" role="tab" id="tab-week" data-tab="week"><svg class="ti" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="15" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span class="tl">Уроки</span></button>
-<button class="tab tool" id="fabprep" aria-label="Открыть подготовку"><svg class="ti" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4h9l3 3v13H6z"/><path d="M9 12h6M9 16h4"/></svg><span class="tl">Подготовка</span></button>
+<button class="tab" role="tab" id="tab-prep" data-tab="prep"><svg class="ti" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4h9l3 3v13H6z"/><path d="M9 12h6M9 16h4"/></svg><span class="tl">Подготовка</span></button>
   <button class="tab" role="tab" id="tab-kr" data-tab="kr"><svg class="ti" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="9" r="3"/><circle cx="17" cy="10" r="2.5"/><path d="M3 19c.8-3 3.2-4.5 6-4.5s5.2 1.5 6 4.5M15 15.2c2.3-.3 4.3.9 5.5 3.3"/></svg><span class="tl">5Ж</span></button>
 <span class="navsep" aria-hidden="true"></span><button class="tab" role="tab" id="tab-ktp" data-tab="ktp"><svg class="ti" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h11a3 3 0 013 3v13H8a3 3 0 01-3-3z"/><path d="M5 17a3 3 0 013-3h11M9 8h6"/></svg><span class="tl">КТП</span></button>
 </nav></div>
@@ -1171,7 +1171,7 @@ function prepTile(x){const src=x.prev,t=src?(get(src.id,'done')||'').trim():'',a
     ${away?`<span class="lt-tags"><span class="lt-room">${roomOf(x)}</span></span>`:''}</button></div>`}
 function prepGrid(ls){const by={};ls.forEach(x=>(by[x.l]=by[x.l]||[]).push(prepTile(x)));let h='';
   for(let n=1;n<=12;n++)h+=by[n]?(by[n].length>1?`<div class="lslot multi">${by[n].join('')}</div>`:by[n][0]):`<div class="ltile empty"><span class="lt-top"><b>${n}</b><span>${t0(n)}</span></span></div>`;
-  return `<div class="lgrid">${h}</div>`}
+  return `<div class="lgrid pgrid">${h}</div>`}
 function renderPrep(){
   const D=byIso[day];
   let h=picker();
@@ -1942,7 +1942,6 @@ document.addEventListener('click',e=>{
   const cl=e.target.closest('[data-collapse]'); if(cl){const det=cl.closest('details');if(det){det.open=false;if(det.id==='mygrid')myGridOpen=false;if(det.dataset.dd)ddOpen[det.dataset.dd]=false;
     const top=det.getBoundingClientRect().top;if(top<80)scrollBy({top:top-90,behavior:window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'})}return}
   if(e.target.closest('#fab')){sheetMode=null;openSched(tab==='kr'?'5zh':'my');return}
-  if(e.target.closest('#fabprep')){openPrep();return}
   const sc=e.target.closest('[data-sched]'); if(sc){openSched(sc.dataset.sched);return}
   const mk=e.target.closest('[data-mark]'); if(mk){const id=mk.dataset.lid;data[id]={...(data[id]||{}),mark:mk.dataset.mark};saveLesson(id);document.querySelectorAll('.marks [data-mark]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.mark===mk.dataset.mark));return}
   const ch=e.target.closest('[data-copyhw]'); if(ch){const x=byId[ch.dataset.copyhw];const t=ch.closest('.field').querySelector('textarea');const txt=t.value.trim();if(!txt){toast('Домашнее задание пустое');return}
