@@ -875,7 +875,6 @@ header.top,header.top::before{background:#FFFFFF!important}
 <div class="tabs"><nav role="tablist">
   <button class="tab" role="tab" id="tab-tasks" data-tab="tasks"><svg class="ti" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11l2 2 4-4"/><rect x="4" y="4" width="16" height="16" rx="4"/></svg><span class="tl">Дела</span><span class="badge" id="tbadge" hidden></span></button>
   <button class="tab" role="tab" id="tab-week" data-tab="week"><svg class="ti" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="15" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span class="tl">Уроки</span></button>
-<button class="tab" role="tab" id="tab-prep" data-tab="prep"><svg class="ti" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4h9l3 3v13H6z"/><path d="M9 12h6M9 16h4"/></svg><span class="tl">Подготовка</span></button>
   <button class="tab" role="tab" id="tab-kr" data-tab="kr"><svg class="ti" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="9" r="3"/><circle cx="17" cy="10" r="2.5"/><path d="M3 19c.8-3 3.2-4.5 6-4.5s5.2 1.5 6 4.5M15 15.2c2.3-.3 4.3.9 5.5 3.3"/></svg><span class="tl">5Ж</span></button>
 <span class="navsep" aria-hidden="true"></span><button class="tab" role="tab" id="tab-ktp" data-tab="ktp"><svg class="ti" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h11a3 3 0 013 3v13H8a3 3 0 01-3-3z"/><path d="M5 17a3 3 0 013-3h11M9 8h6"/></svg><span class="tl">КТП</span></button>
 </nav></div>
@@ -1671,7 +1670,8 @@ function renderKtp(){
   if(!ktpPlan){const nx=ALL.filter(x=>x.iso>=todayIso&&ktpKey(x.cls,x.sub)).sort((a,b)=>a.iso<b.iso?-1:a.iso>b.iso?1:a.l-b.l)[0];ktpPlan=nx?ktpKey(nx.cls,nx.sub):'m5';if(nx)ktpCls[ktpPlan]=nx.cls}
   const [lab,sub,classes]=KTPMETA[ktpPlan];const cls=ktpCls[ktpPlan]&&classes.includes(ktpCls[ktpPlan])?ktpCls[ktpPlan]:classes[0];
   const P=ktpPlanFor(cls,sub), ch=P.ch, base=P.base, sh=ktpShift(cls,sub), max=P.max;
-  const cur=ch.find(x=>x.iso>=todayIso), cp=cur?P.per[cur.id]:null, curN=cp&&cp.ns.length?cp.ns[0]:null;
+  const _n=new Date(),_iso=`${_n.getFullYear()}-${pad(_n.getMonth()+1)}-${pad(_n.getDate())}`,_m=_n.getHours()*60+_n.getMinutes(),_end=x=>{const t=TIMES[x.l];if(!t)return 0;const[h,mi]=t.split('–')[1].split(':');return +h*60+ +mi};
+  const cur=ch.find(x=>x.iso>_iso||(x.iso===_iso&&_end(x)>_m))||ch.find(x=>x.iso>=todayIso), cp=cur?P.per[cur.id]:null, curN=cp&&cp.ns.length?cp.ns[0]:null;
   const past=ch.filter(x=>x.iso<todayIso), written=past.filter(x=>get(x.id,'done').trim()).length;
   const nManual=ch.filter(x=>kr.ktpSet[x.id]).length;
   const planBar=`<div class="days ktpplans" role="group" aria-label="План">${Object.entries(KTPMETA).map(([k,m])=>`<button class="day" data-ktpplan="${k}" aria-pressed="${k===ktpPlan}"><b style="font-size:13px;white-space:nowrap">${m[0]}</b></button>`).join('')}</div>`;
@@ -1811,6 +1811,8 @@ let lastTab=null, lastSig='';
 function render(){
   syncExtras();scheduleDigest();
   if(tab==='classes'){tab='week';lessonsMode='classes'}
+  if(tab==='prep')tab='week';
+  if(tab==='ktp'&&lastTab!=='ktp')ktpAuto();
   document.getElementById('title').textContent=TITLES[tab];
   try{const eb=document.getElementById('eyebrow');const n=new Date(),W=['Воскресенье','Понедельник','Вторник','Среда','Четверг','Пятница','Суббота'],M=['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
     if(tab==='week'&&byIso[day]){const [y,m,d]=day.split('-').map(Number),dt=new Date(y,m-1,d);let t=`${innerWidth<480?['Вс','Пн','Вт','Ср','Чт','Пт','Сб'][dt.getDay()]:W[dt.getDay()]}, ${d} ${M[m-1]}`;if(!isOff(day)){const c=dayLessons(day,true).filter(x=>!isCancel(x)).length;t+=` · ${c} ${plural(c)}`}eb.textContent=t}
@@ -2035,6 +2037,16 @@ function fitGrid(){const g=document.querySelector('#view .lgrid');if(!g)return;g
       const a=document.activeElement;if(a&&sh&&sh.contains(a)&&a.matches('textarea,input')){const r=a.getBoundingClientRect(),sr=sh.getBoundingClientRect();if(r.bottom>sr.bottom-8||r.top<sr.top)sh.scrollTop+=r.top-sr.top-60}}
     else{w.style.top='';w.style.height='';w.style.bottom='';w.style.alignItems='';if(sh)sh.style.maxHeight=''}}
   vv.addEventListener('resize',fit);vv.addEventListener('scroll',fit);document.addEventListener('focusin',()=>setTimeout(fit,60));document.addEventListener('focusout',()=>setTimeout(fit,120))})();
+
+// КТП: автоматически открывается класс и предмет текущего или следующего урока
+let ktpAutoId=null;
+function ktpTarget(){const n=new Date(),iso=`${n.getFullYear()}-${pad(n.getMonth()+1)}-${pad(n.getDate())}`,m=n.getHours()*60+n.getMinutes();
+  const mm=s=>{const[h,mi]=s.trim().split(':');return +h*60+ +mi};
+  return ALL.filter(x=>!x.extra&&ktpKey(x.cls,x.sub)&&!isCancel(x)&&(x.iso>iso||(x.iso===iso&&TIMES[x.l]&&mm(TIMES[x.l].split('–')[1])>m)))
+    .sort((a,b)=>a.iso<b.iso?-1:a.iso>b.iso?1:a.l-b.l)[0]||null}
+function ktpAuto(){const t=ktpTarget();ktpAutoId=t?t.id:'';if(!t)return;ktpPlan=ktpKey(t.cls,t.sub);ktpCls[ktpPlan]=t.cls;
+  setTimeout(()=>{const c=document.getElementById('ktp-cur');if(c&&tab==='ktp')c.scrollIntoView({block:'center'})},80)}
+setInterval(()=>{if(tab!=='ktp'||!sheet.hidden)return;const a=document.activeElement;if(a&&a.matches&&a.matches('textarea,input'))return;const t=ktpTarget();if((t?t.id:'')!==ktpAutoId){ktpAuto();render()}},20000);
 // подсветка урока, который идёт прямо сейчас
 function markNow(){const n=new Date(),iso=`${n.getFullYear()}-${pad(n.getMonth()+1)}-${pad(n.getDate())}`,m=n.getHours()*60+n.getMinutes();
   const mm=s=>{const[h,mi]=s.trim().split(':');return +h*60+ +mi};
