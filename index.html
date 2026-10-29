@@ -2025,7 +2025,7 @@ function fitGrid(){const g=document.querySelector('#view .lgrid');if(!g)return;g
   const gr=g.getBoundingClientRect();let lim=navTop;['#fab','.scrollfab'].forEach(q=>{const f=document.querySelector(q);if(!f||f.hidden||getComputedStyle(f).display==='none')return;const r=f.getBoundingClientRect();if(r.width&&r.left<gr.right&&r.top<lim)lim=r.top});
   const avail=lim-gr.top-10;
   if(scrollY>40)return;
-  let h=Math.floor((avail-2*gap)/3);h=Math.max(96,Math.min(320,h));g.style.gridAutoRows=h+'px'}
+  let h=Math.floor((avail-2*gap)/3);h=Math.max(96,h);g.style.gridAutoRows=h+'px'}
 {let raf2=0;const run=()=>{cancelAnimationFrame(raf2);raf2=requestAnimationFrame(fitGrid)};new MutationObserver(run).observe(document.getElementById('view'),{childList:true});addEventListener('resize',run);setTimeout(run,300)}
 
 // iOS Safari: окно урока поднимается над клавиатурой
