@@ -827,7 +827,7 @@ header.top,header.top::before{background:#FFFFFF!important}
 .days{padding:4px 4px 6px!important;margin-left:-4px!important;margin-right:-4px!important;margin-top:2px}
 
 @media (max-width:699px){.tabs nav{padding:4px!important;gap:3px!important;border-radius:20px!important}.tab{padding:5px 2px 4px!important;border-radius:15px!important;gap:1px!important}.tab .ti{width:20px!important;height:20px!important}.tab .tl{font-size:10px!important}
-.schedfab{bottom:calc(68px + env(safe-area-inset-bottom,0px))!important}.scrollfab{bottom:calc(68px + env(safe-area-inset-bottom,0px))!important;right:calc(max(14px,env(safe-area-inset-right,0px)) + 50px)!important}
+.schedfab{bottom:calc(86px + env(safe-area-inset-bottom,0px))!important}.scrollfab{bottom:calc(86px + env(safe-area-inset-bottom,0px))!important;right:calc(max(14px,env(safe-area-inset-right,0px)) + 50px)!important}
 .app{padding-bottom:calc(136px + env(safe-area-inset-bottom,0px))!important}}
 .schedfab{background:#FFD43B!important;color:#3A2A00!important;box-shadow:0 4px 14px rgba(120,90,0,.28)!important}
 
@@ -2068,6 +2068,15 @@ function ktpTarget(){const n=new Date(),iso=`${n.getFullYear()}-${pad(n.getMonth
 function ktpAuto(){const t=ktpTarget();ktpAutoId=t?t.id:'';if(!t)return;ktpPlan=ktpKey(t.cls,t.sub);ktpCls[ktpPlan]=t.cls;
   setTimeout(()=>{const c=document.getElementById('ktp-cur');if(c&&tab==='ktp')c.scrollIntoView({block:'center'})},80)}
 setInterval(()=>{if(tab!=='ktp'||!sheet.hidden)return;const a=document.activeElement;if(a&&a.matches&&a.matches('textarea,input'))return;const t=ktpTarget();if((t?t.id:'')!==ktpAutoId){ktpAuto();render()}},20000);
+
+// свайп влево/вправо в «Уроках» переключает день
+(function(){let x0=0,y0=0,t0=0,ok=false;const v=document.getElementById('view');
+  v.addEventListener('touchstart',e=>{if(tab!=='week'||e.touches.length!==1){ok=false;return}const t=e.touches[0];x0=t.clientX;y0=t.clientY;t0=Date.now();ok=!e.target.closest('input,textarea,select,.days,.ttwrap')},{passive:true});
+  v.addEventListener('touchend',e=>{if(!ok||tab!=='week'||!sheet.hidden)return;ok=false;const t=e.changedTouches[0],dx=t.clientX-x0,dy=t.clientY-y0;
+    if(Math.abs(dx)<60||Math.abs(dx)<Math.abs(dy)*1.6||Date.now()-t0>700)return;
+    const i=DATES.findIndex(d=>d.iso===day);let j=i+(dx<0?1:-1);while(j>=0&&j<DATES.length&&isOff(DATES[j].iso))j+=(dx<0?1:-1);
+    if(j<0||j>=DATES.length)return;day=DATES[j].iso;render();
+    const g=v.querySelector('.lgrid');if(g&&g.animate)g.animate([{transform:`translateX(${dx<0?40:-40}px)`,opacity:.3},{transform:'none',opacity:1}],{duration:200,easing:'ease-out'})},{passive:true})})();
 // подсветка урока, который идёт прямо сейчас
 function markNow(){const n=new Date(),iso=`${n.getFullYear()}-${pad(n.getMonth()+1)}-${pad(n.getDate())}`,m=n.getHours()*60+n.getMinutes();
   const mm=s=>{const[h,mi]=s.trim().split(':');return +h*60+ +mi};
