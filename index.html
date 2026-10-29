@@ -866,6 +866,27 @@ header.top,header.top::before{background:#FFFFFF!important}
 
 .tab .ti{width:24px!important;height:24px!important}.tab .tl{font-size:11.5px!important}
 @media (min-width:700px){.tab .ti{width:22px!important;height:22px!important}.tab .tl{font-size:11px!important}.tabs nav{max-width:400px!important}}
+
+.tsum{gap:8px!important;margin-bottom:10px!important}
+.tsum .tstat{padding:8px 6px!important;min-height:0!important;border-radius:14px!important}
+.tsum .tstat b{font-size:22px!important;line-height:1!important}
+.tsum .tstat span{font-size:12px!important}
+.addtask{padding:8px!important;margin-bottom:10px!important}
+.addtask .kr-in#task-new{height:44px}
+.addtask .plus{width:44px!important;height:44px!important;min-width:44px}
+.tfilter{margin-bottom:6px!important}
+.closedfar{margin-top:70vh!important;margin-top:70svh!important}
+
+.hwgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-bottom:6px}
+@media (min-width:700px){.hwgrid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.hwc{display:flex;align-items:stretch;background:var(--card);border-radius:12px;box-shadow:var(--shadow);overflow:hidden;border:1px solid var(--line)}
+.hwc.hlate{border-color:#F2B8B5}
+.hwj{flex:1;min-width:0;padding:7px 9px;text-decoration:none;color:var(--ink);display:grid;line-height:1.2}
+.hwj b{font-family:var(--display);font-size:16px}.hwj span{font-size:12px}
+.hwj{grid-template-columns:auto 1fr;column-gap:5px;align-items:baseline}.hwj small{grid-column:1/-1;font-size:11px;opacity:.7;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hwj span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hwc.hlate .hwj small{color:#C62828;opacity:1;font-weight:600}
+.hwok{border:0;background:#159A57;color:#fff;font-size:18px;font-weight:700;width:42px;cursor:pointer;font-family:inherit}
 </style>
 
 <div class="app">
@@ -1308,7 +1329,7 @@ document.addEventListener('input',e=>{if(e.target.id==='task-new')newTaskText=e.
 function taskCounts(){const today=todayIso,CH=checkItems();const open=kr.tasks.filter(isOpen);
   const late=open.filter(t=>t.date<today).length+CH.filter(c=>!c.done&&c.date<today).length;
   const tod=open.filter(t=>t.date===today).length+CH.filter(c=>!c.done&&c.date===today).length;
-  const hd=hwDue();return {late:late+hd.filter(x=>x.iso<today).length,tod:tod+hd.filter(x=>x.iso===today).length,work:open.filter(t=>t.status==='work').length}}
+  return {late:late,tod:tod,work:open.filter(t=>t.status==='work').length}}
 function updateBadge(){const b=document.getElementById('tbadge');if(!b)return;const c=taskCounts();const n=c.late+c.tod;b.hidden=!n;b.textContent=n;b.classList.toggle('red',c.late>0)}
 function renderTasks(){
   if(fixTasks())saveKr(true);
@@ -1319,8 +1340,7 @@ function renderTasks(){
   const sortT=(a,b)=>(b.imp?1:0)-(a.imp?1:0)||(a.status==='work'?-1:0)-(b.status==='work'?-1:0)||(a.date<b.date?-1:a.date>b.date?1:0);
   const c=taskCounts();
   let h=`<div class="tsum"><button class="tstat ${c.late?'red':''}" data-jump="late"><b>${c.late}</b><span>просрочено</span></button><button class="tstat" data-jump="today"><b>${c.tod}</b><span>на сегодня</span></button><button class="tstat" data-jump="work"><b>${c.work}</b><span>в работе</span></button></div>`;
-  h+=hwRows();
-  h+=weekReview();
+  const hwH=hwRows();
   h+=`<form class="kr-card addtask ${formOpen||newTaskText||pendingFiles.length?'open':''}" data-form="task">
     <div class="addrow"><input class="kr-in" id="task-new" placeholder="Новое дело…" autocomplete="off" value="${esc(newTaskText)}"><button class="btn primary plus" type="submit" aria-label="Добавить">+</button></div><div class="more">
     <div class="catpick" role="group" aria-label="Категория">${Object.entries(CATS).map(([k,l])=>`<button type="button" class="catbtn c-${k}" data-newcat="${k}" aria-pressed="${newCat===k}">${l}</button>`).join('')}</div>
@@ -1343,8 +1363,7 @@ function renderTasks(){
   if(later.length)h+=`<div class="section-title">Позже <small>${later.length}</small></div><div class="tlist">${later.map(taskRow).join('')}</div>`;
   const closed=kr.tasks.filter(t=>t.status==='done'&&(taskFilter==='all'||t.cat===taskFilter)).sort((a,b)=>(b.doneAt||'')<(a.doneAt||'')?-1:1);
   const closedC=showChecks?CH.filter(x=>x.done):[];
-  if(closed.length||closedC.length)h+=`<details class="dd" data-dd="closed" ${ddOpen.closed?'open':''} style="margin-top:16px"><summary><span><b>Закрытые</b><span class="sm">выполненные дела, можно вернуть</span></span><span class="pill">${closed.length+closedC.length}</span></summary><div class="tlist" style="box-shadow:none;margin:0 10px 10px">${closedC.map(vRow).join('')}${closed.map(taskRow).join('')}</div></details>`;
-  h+=backupCard();
+  if(closed.length||closedC.length)h+=`<details class="dd closedfar" data-dd="closed" ${ddOpen.closed?'open':''}><summary><span><b>Закрытые</b><span class="sm">выполненные дела, можно вернуть</span></span><span class="pill">${closed.length+closedC.length}</span></summary><div class="tlist" style="box-shadow:none;margin:0 10px 10px">${closedC.map(vRow).join('')}${closed.map(taskRow).join('')}</div></details>`;
   return h;
 }
 // расписание 5Ж (шаблон как в школьном расписании)
@@ -1712,9 +1731,8 @@ function hwDue(){const n=new Date(),mins=n.getHours()*60+n.getMinutes();
   return ALL.filter(x=>hwTracked(x)&&!get(x.id,'hwp')&&(x.iso<todayIso||(x.iso===todayIso&&lessonEnd(x)<=mins))).sort((a,b)=>a.iso<b.iso?-1:a.iso>b.iso?1:a.l-b.l)}
 function setHwp(id,v){data[id]={...(data[id]||{}),hwp:!!v};saveLesson(id)}
 function hwRows(){const due=hwDue();if(!due.length)return '';
-  return `<div class="section-title" id="sec-hw">Выложить д/з <small>${due.length}</small></div><div class="tlist">${due.map(x=>{const late=x.iso<todayIso;
-    return `<div class="task ${late?'is-late':''}"><div class="trow"><span class="star auto" aria-hidden="true">✎</span><div class="tbody"><div class="ttext">Выложить д/з: <b>${x.cls}</b>, ${x.sub.toLowerCase()}</div><div class="tmeta"><span>${WDS[wdOf(x.iso)]} ${dm(x.iso)}, ${x.l} урок</span>${late?`<span class="late">не выложено с ${dm(x.iso)}</span>`:''}</div></div></div>
-      <div class="tactions"><button class="sbtn ok" data-hwp="${x.id}">Выложено</button><a class="sbtn jlink" href="${journalUrl(x)}" target="_blank" rel="noopener" data-jid="${x.id}">Журнал</a></div></div>`}).join('')}</div>`}
+  return `<div class="section-title" id="sec-hw">Выложить д/з <small>${due.length}</small></div><div class="hwgrid">${due.map(x=>{const late=x.iso<todayIso;
+    return `<div class="hwc ${late?'hlate':''}"><a class="hwj" href="${journalUrl(x)}" target="_blank" rel="noopener" data-jid="${x.id}"><b>${x.cls}</b> <span>${subTile(x.sub)}</span><small>${WDS[wdOf(x.iso)]} ${dm(x.iso)} · ${x.l} ур.</small></a><button class="hwok" data-hwp="${x.id}" aria-label="Выложено">✓</button></div>`}).join('')}</div>`}
 // вопрос при возвращении из журнала
 let hwAsk=null;
 const hwAskable=x=>!!x&&!x.extra&&!!journalUrl(x)&&!isCancel(x);
