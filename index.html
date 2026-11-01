@@ -898,7 +898,7 @@ header.top,header.top::before{background:#FFFFFF!important}
 @media(max-width:559px){.dayfoot .week-switch{order:3;flex:1 1 100%;justify-content:center}.dayfoot.week-only .week-switch{order:initial;flex:initial}}
 @media(min-width:560px){.dayfoot{gap:6px}.dayfoot .btn.attach{padding:8px 12px;font-size:13px}.dayfoot .linkbtn{font-size:12px;padding:4px}.dayfoot .week-switch{gap:4px;padding:4px 5px}.dayfoot .week-switch .wbtn{width:30px;height:30px;flex:0 0 30px;font-size:18px}.dayfoot .week-switch-label{min-width:74px}.dayfoot .week-switch-label b{font-size:12px}.dayfoot .week-switch-label span{font-size:10px}}
 .lt-line.subject-cut{align-items:flex-start;flex-direction:column;gap:2px}.lt-line.subject-cut>.lt-sub{width:100%;flex:0 0 auto}.lt-line.subject-cut>.lt-tags{flex:0 0 auto}
-.lt-sub.lt-sub-full{white-space:normal;overflow:visible;text-overflow:clip;overflow-wrap:anywhere}
+.lt-sub.lt-sub-full{font-size:9.5px;line-height:1.2;white-space:nowrap;overflow:visible;text-overflow:clip;overflow-wrap:normal;word-break:keep-all}
 </style>
 
 <div class="app">
@@ -1845,7 +1845,7 @@ function addSlog(i){const tx=document.getElementById('sl-text').value.trim();if(
   (kr.slog[i]=kr.slog[i]||[]).push(e);saveKr(true);openStudent(i);toast(rem?'Запись добавлена, напоминание в «Делах»':'Запись добавлена');render()}
 const TITLES={tasks:'Дела',week:'Уроки',ktp:'КТП',prep:'Подготовка',classes:'Классы',kr:'5Ж'};
 let lastTab=null, lastSig='';
-function markTruncatedSubjects(){view.querySelectorAll('.lt-line').forEach(line=>{const sub=line.querySelector('.lt-sub');if(!sub||!line.querySelector('.lt-room'))return;line.classList.remove('subject-cut');if(sub.scrollWidth>sub.clientWidth+1)line.classList.add('subject-cut')})}
+function markTruncatedSubjects(){view.querySelectorAll('.lt-line').forEach(line=>{const sub=line.querySelector('.lt-sub');if(!sub)return;line.classList.remove('subject-cut');if(sub.classList.contains('lt-sub-full')||line.querySelector('.lt-room')&&sub.scrollWidth>sub.clientWidth+1)line.classList.add('subject-cut')})}
 function render(){
   syncExtras();scheduleDigest();
   if(tab==='classes'){tab='week';lessonsMode='classes'}
